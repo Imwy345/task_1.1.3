@@ -2,6 +2,7 @@ package jm.task.core.jdbc.dao;
 
 import jm.task.core.jdbc.model.User;
 import jm.task.core.jdbc.util.Util;
+import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.annotations.common.util.impl.LoggerFactory;
@@ -30,9 +31,8 @@ public class UserDaoHibernateImpl implements UserDao {
             transaction.commit();
             logger.info("Создана таблица users");
 
-        } catch (Exception e) {
+        } catch (HibernateException e) {
             if (transaction != null) transaction.rollback();
-            e.printStackTrace();
             logger.log(Level.SEVERE, "Ошибка при создании таблицы users: ", e);
         }
     }
@@ -47,9 +47,8 @@ public class UserDaoHibernateImpl implements UserDao {
             transaction.commit();
             logger.info("Таблица users удалена");
 
-        } catch (Exception e) {
+        } catch (HibernateException e) {
             if (transaction != null) transaction.rollback();
-            e.printStackTrace();
             logger.log(Level.SEVERE, "Ошибка при удалении таблицы users: ", e);
         }
     }
@@ -63,7 +62,7 @@ public class UserDaoHibernateImpl implements UserDao {
             session.save(user);
             transaction.commit();
             logger.info("Пользователь " + name + " " + lastName + "  сохранен");
-        } catch (Exception e) {
+        } catch (HibernateException e) {
             if (transaction != null) {
                 transaction.rollback();
                 logger.log(Level.SEVERE, "Ошибка при сохранении пользователя " + name + " " + lastName + ": ", e);
@@ -84,9 +83,8 @@ public class UserDaoHibernateImpl implements UserDao {
                 logger.warning("Пользователь с id " + id + " не найден");
             }
             transaction.commit();
-        } catch (Exception e) {
+        } catch (HibernateException e) {
             if (transaction != null) transaction.rollback();
-            e.printStackTrace();
             logger.log(Level.SEVERE, "Ошибка при удалении пользователя с id " + id + ": ", e);
         }
     }
@@ -97,7 +95,7 @@ public class UserDaoHibernateImpl implements UserDao {
         try (Session session = Util.getSessionFactory().openSession()) {
             users = session.createQuery("FROM User", User.class).list();
             logger.info("Получен список пользователей");
-        } catch (Exception e) {
+        } catch (HibernateException e) {
             logger.log(Level.SEVERE, "Ошибка при получении списка пользователей: ", e);
         }
         return users;
@@ -111,7 +109,7 @@ public class UserDaoHibernateImpl implements UserDao {
             session.createQuery("DELETE FROM User").executeUpdate();
             transaction.commit();
             logger.info("Таблица users очищена.");
-        } catch (Exception e) {
+        } catch (HibernateException e) {
             if (transaction != null) transaction.rollback();
             logger.log(Level.SEVERE, "Ошибка при очистке таблицы users: ", e);
         }
